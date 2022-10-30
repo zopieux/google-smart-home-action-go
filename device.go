@@ -54,7 +54,7 @@ type Device struct {
 	RoomHint string
 
 	// Attributes linked to the defined traits
-	attributes map[string]interface{}
+	Attributes map[string]interface{}
 
 	// DeviceInfo that is physically defined
 	DeviceInfo DeviceInfo
@@ -72,7 +72,7 @@ func NewDevice(id string, typ string) *Device {
 		ID:         id,
 		Type:       typ,
 		Traits:     map[string]bool{},
-		attributes: map[string]interface{}{},
+		Attributes: map[string]interface{}{},
 		CustomData: map[string]interface{}{},
 	}
 }
@@ -89,7 +89,7 @@ type DeviceInput struct {
 	Names []DeviceInputName `json:"names"`
 }
 
-// NewSimpleAVReceiver creates a new device with the attributes for a simple AV receiver setup.
+// NewSimpleAVReceiver creates a new device with the Attributes for a simple AV receiver setup.
 func NewSimpleAVReceiver(id string, inputs []DeviceInput, maxLevel int, canMute bool, onlyCommand bool) *Device {
 	d := NewDevice(id, "action.devices.types.AUDIO_VIDEO_RECEIVER")
 	d.AddOnOffTrait(false, false)
@@ -98,7 +98,7 @@ func NewSimpleAVReceiver(id string, inputs []DeviceInput, maxLevel int, canMute 
 	return d
 }
 
-// NewLight creates a new device with the attributes for an on-off light.
+// NewLight creates a new device with the Attributes for an on-off light.
 // This can be customized with any of the light-related traits (Color, Brightness).
 func NewLight(id string) *Device {
 	d := NewDevice(id, "action.devices.types.LIGHT")
@@ -106,14 +106,14 @@ func NewLight(id string) *Device {
 	return d
 }
 
-// NewOutlet creates a new device with the attributes for an on-off outlet.
+// NewOutlet creates a new device with the Attributes for an on-off outlet.
 func NewOutlet(id string) *Device {
 	d := NewDevice(id, "action.devices.types.OUTLET")
 	d.AddOnOffTrait(false, false)
 	return d
 }
 
-// NewSwitch creates a new device with the attributes for an on-off switch.
+// NewSwitch creates a new device with the Attributes for an on-off switch.
 // This can be customized with the Brightness trait.
 func NewSwitch(id string) *Device {
 	d := NewDevice(id, "action.devices.types.SWITCH")
@@ -127,7 +127,7 @@ func NewSwitch(id string) *Device {
 func (d *Device) AddBrightnessTrait(onlyCommand bool) *Device {
 	d.Traits["action.devices.traits.Brightness"] = true
 	if onlyCommand {
-		d.attributes["commandOnlyBrightness"] = true
+		d.Attributes["commandOnlyBrightness"] = true
 	}
 
 	return d
@@ -147,9 +147,9 @@ const (
 func (d *Device) AddColourTrait(model string, onlyCommand bool) *Device {
 	d.Traits["action.devices.traits.ColorSetting"] = true
 	if onlyCommand {
-		d.attributes["commandOnlyColorSetting"] = true
+		d.Attributes["commandOnlyColorSetting"] = true
 	}
-	d.attributes["colorModel"] = model
+	d.Attributes["colorModel"] = model
 
 	return d
 }
@@ -162,11 +162,11 @@ func (d *Device) AddColourTemperatureTrait(minTempK int, maxTempK int, onlyComma
 	d.Traits["action.devices.traits.ColorSetting"] = true
 
 	if onlyCommand {
-		d.attributes["commandOnlyColorSetting"] = true
+		d.Attributes["commandOnlyColorSetting"] = true
 	} else {
-		d.attributes["commandOnlyColorSetting"] = false
+		d.Attributes["commandOnlyColorSetting"] = false
 	}
-	d.attributes["colorTemperatureRange"] = map[string]int{
+	d.Attributes["colorTemperatureRange"] = map[string]int{
 		"temperatureMinK": minTempK,
 		"temperatureMaxK": maxTempK,
 	}
@@ -178,8 +178,8 @@ func (d *Device) AddColourTemperatureTrait(minTempK int, maxTempK int, onlyComma
 // See https://developers.google.com/assistant/smarthome/traits/inputselector
 func (d *Device) AddInputSelectorTrait(availableInputs []DeviceInput, ordered bool) *Device {
 	d.Traits["action.devices.traits.InputSelector"] = true
-	d.attributes["availableInputs"] = availableInputs
-	d.attributes["orderedInputs"] = ordered
+	d.Attributes["availableInputs"] = availableInputs
+	d.Attributes["orderedInputs"] = ordered
 
 	return d
 }
@@ -191,10 +191,10 @@ func (d *Device) AddInputSelectorTrait(availableInputs []DeviceInput, ordered bo
 func (d *Device) AddOnOffTrait(onlyCommand, onlyQuery bool) *Device {
 	d.Traits["action.devices.traits.OnOff"] = true
 	if onlyCommand {
-		d.attributes["commandOnlyOnOff"] = true
+		d.Attributes["commandOnlyOnOff"] = true
 	}
 	if onlyQuery {
-		d.attributes["queryOnlyOnOff"] = true
+		d.Attributes["queryOnlyOnOff"] = true
 	}
 
 	return d
@@ -205,10 +205,10 @@ func (d *Device) AddOnOffTrait(onlyCommand, onlyQuery bool) *Device {
 func (d *Device) AddVolumeTrait(maxLevel int, canMute bool, onlyCommand bool) *Device {
 	d.Traits["action.devices.traits.Volume"] = true
 	if onlyCommand {
-		d.attributes["commandOnlyVolume"] = true
+		d.Attributes["commandOnlyVolume"] = true
 	}
-	d.attributes["volumeMaxLevel"] = maxLevel
-	d.attributes["volumeCanMuteAndUnmute"] = canMute
+	d.Attributes["volumeMaxLevel"] = maxLevel
+	d.Attributes["volumeCanMuteAndUnmute"] = canMute
 
 	return d
 }
@@ -227,7 +227,7 @@ func (d Device) MarshalJSON() ([]byte, error) {
 	dr.Name.Nicknames = d.Name.Nicknames
 	dr.WillReportState = d.WillReportState
 	dr.RoomHint = d.RoomHint
-	dr.Attributes = d.attributes
+	dr.Attributes = d.Attributes
 	dr.DeviceInfo.Manufacturer = d.DeviceInfo.Manufacturer
 	dr.DeviceInfo.Model = d.DeviceInfo.Model
 	dr.DeviceInfo.HwVersion = d.DeviceInfo.HwVersion
@@ -264,7 +264,7 @@ func (d *Device) UnmarshalJSON(data []byte) error {
 	d.Name.Nicknames = dr.Name.Nicknames
 	d.WillReportState = dr.WillReportState
 	d.RoomHint = dr.RoomHint
-	d.attributes = dr.Attributes
+	d.Attributes = dr.Attributes
 	d.DeviceInfo.Manufacturer = dr.DeviceInfo.Manufacturer
 	d.DeviceInfo.Model = dr.DeviceInfo.Model
 	d.DeviceInfo.HwVersion = dr.DeviceInfo.HwVersion
