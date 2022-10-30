@@ -1,4 +1,4 @@
-module github.com/rmrobinson/google-smart-home-action-go
+module github.com/zopieux/google-smart-home-action-go
 
 go 1.14
 
