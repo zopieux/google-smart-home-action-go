@@ -53,3 +53,23 @@ func TestCommandColorAbsoluteDeserializer(t *testing.T) {
 	assert.Equal(t, 1.0, cmd.ColorAbsolute.Color.HSV.Saturation)
 	assert.Equal(t, 1.0, cmd.ColorAbsolute.Color.HSV.Value)
 }
+
+func TestCommandGeneric(t *testing.T) {
+	msg := `{
+		"command": "action.devices.commands.appSelect",
+		"params": {
+		  "newApplication": "yt"
+  		}
+	  }`
+
+	cmd := Command{}
+	err := json.Unmarshal([]byte(msg), &cmd)
+	assert.Nil(t, err)
+	assert.NotNil(t, cmd.Generic)
+	assert.NotNil(t, cmd.Generic.Params)
+	assert.Equal(t, "yt", cmd.Generic.Params["newApplication"])
+
+	dat, err := json.Marshal(cmd)
+	assert.Nil(t, err)
+	assert.Equal(t, `{"command":"action.devices.commands.appSelect","params":{"newApplication":"yt"}}`, string(dat))
+}
