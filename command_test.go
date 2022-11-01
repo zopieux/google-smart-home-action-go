@@ -73,3 +73,16 @@ func TestCommandGeneric(t *testing.T) {
 	assert.Nil(t, err)
 	assert.Equal(t, `{"command":"action.devices.commands.appSelect","params":{"newApplication":"yt"}}`, string(dat))
 }
+
+func TestCommandGenericNoParams(t *testing.T) {
+	msg := `{"command": "action.devices.commands.appSelect"}`
+
+	cmd := Command{}
+	err := json.Unmarshal([]byte(msg), &cmd)
+	assert.Nil(t, err)
+	assert.NotNil(t, cmd.Generic)
+	assert.Nil(t, cmd.Generic.Params)
+	dat, err := json.Marshal(cmd)
+	assert.Nil(t, err)
+	assert.Equal(t, `{"command":"action.devices.commands.appSelect"}`, string(dat))
+}

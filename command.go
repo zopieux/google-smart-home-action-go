@@ -46,7 +46,7 @@ func (c Command) MarshalJSON() ([]byte, error) {
 	case "action.devices.commands.PreviousInput":
 		details = c.PreviousInput
 	default:
-		details = c.Generic.Params
+		return json.Marshal(c.Generic)
 	}
 
 	var tmp struct {
@@ -106,7 +106,11 @@ func (c *Command) UnmarshalJSON(data []byte) error {
 		details = c.PreviousInput
 	default:
 		c.Generic = &CommandGeneric{}
-		details = &c.Generic.Params
+		err := json.Unmarshal(data, c.Generic)
+		if err != nil {
+			return err
+		}
+		return nil
 	}
 
 	err = json.Unmarshal(tmp.Params, details)
@@ -120,7 +124,8 @@ func (c *Command) UnmarshalJSON(data []byte) error {
 // CommandGeneric contains a command definition which hasn't been parsed into a specific command structure.
 // This is intended to support newly defined commands which callers of this SDK may handle but this does not yet support.
 type CommandGeneric struct {
-	Params  map[string]interface{} `json:"params"`
+	Command string                 `json:"command"`
+	Params  map[string]interface{} `json:"params,omitempty"`
 }
 
 // CommandBrightnessAbsolute requests to set the brightness to an absolute value
